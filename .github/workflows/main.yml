@@ -15,10 +15,14 @@ jobs:
         sudo sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
         sudo systemctl restart ssh
 
-    - name: Install Tunnelmole
+    - name: Install Cloudflare Tunnel
       run: |
-        curl -fsSL https://get.tunnelmole.com | bash
-        tunnelmole ssh 22 > tunnel.log 2>&1 &
+        curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+        chmod +x cloudflared
+
+    - name: Start Cloudflare Tunnel
+      run: |
+        ./cloudflared tunnel --url ssh://localhost:22 > tunnel.log 2>&1 &
         sleep 10
         cat tunnel.log
 
