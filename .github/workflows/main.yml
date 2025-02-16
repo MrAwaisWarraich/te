@@ -1,0 +1,26 @@
+name: Free VPS with SSH
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install SSH Server
+      run: |
+        sudo apt update
+        sudo apt install -y openssh-server
+        sudo systemctl start ssh
+        sudo systemctl enable ssh
+        echo "root:password123" | sudo chpasswd
+        sudo sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+        sudo systemctl restart ssh
+
+    - name: Install Tunnelmole
+      run: |
+        curl -fsSL https://get.tunnelmole.com | bash
+        tunnelmole ssh 22 > tunnel.log 2>&1 &
+        sleep 10
+        cat tunnel.log
+
+    - name: Keep Runner Alive
+      run: sleep 999999
